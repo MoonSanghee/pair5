@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<p>{{ user.username }}</p>
+<p>{{ user.last_name}}{{ user.first_name}}</p>
+<p>{{ user.email }}</p>
+<p>{{ user.followings.count}}/{{ user.followers.count }}</p>
+{% for review in user.review_set.all %}
+    {{ review.title }}
+{% endfor %}
+{% for comment in user.comment_set.all %}
+    {{ comment.review.title }} | {{ comment.content }}
+{% endfor %}
+{% if request.user != user %}
+    <a class='btn btn-primary text-decoration-none' href="{% url 'accounts:follow' user.pk %}">
+    {% if request.user in user.followers.all %}
+        팔로우 취소
+    {% else %}
+        팔로우
+    {% endif %}
+    </a>
+{% endif %}
+{% if request.user == user %}
+<a href="{% url 'accounts:update' %}">정보 수정</a>
+<a href="{% url 'accounts:change_password' %}">비밀번호 변경</a>
+<a href="{% url 'accounts:delete' %}">탈퇴하기</a>
+{% endif %}
+
+{% endblock %}

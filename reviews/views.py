@@ -4,6 +4,8 @@ from .models import Review
 from django.contrib.auth.decorators import login_required
 from .forms import ReviewForm, CommentForm
 from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.db.models import Q
 
 # Create your views here.
 def index(request):
@@ -83,3 +85,20 @@ def likes(request, reviews_pk):
         is_liked = True
     context = {'isLiked': is_liked, 'likeCount': review.like_user.count()}
     return JsonResponse(context)
+
+def search(request):
+    if request.method == 'POST':
+        searched = request.POST['searched']
+        field = request.POST['field']
+        if field == '1':
+            reviews = Review.objects.filter(Q(title__contains=searched) | Q(content__contains=searched) | Q(user__username__contains=searched))
+        elif field == '2':
+            reviews = Review.objects.filter(Q(title__contains=searched))
+        elif field == '3':
+            reviews = Review.objects.filter(Q(content__contains=searched))
+        elif field == '4':
+            reviews = Review.objects.filter(Q(user__username__contains=searched))
+        context = {'reviews' : reviews}
+        return render(request, 'reviews/index.html', context)
+    else:
+        return redirect('reviews:index')

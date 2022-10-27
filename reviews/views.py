@@ -51,7 +51,7 @@ def update(request, pk):
                 messages.success(request, '글이 수정되었습니다.')
                 return redirect('reviews:detail', review.pk)
         else:
-            review_form = ReviewForm()
+            review_form = ReviewForm(instance=review)
         context = {
             'review_form': review_form
         }

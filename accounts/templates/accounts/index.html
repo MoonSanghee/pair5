@@ -2,13 +2,21 @@
 {% block content %}
 {% if request.user.is_authenticated %}
 <a href="{% url 'accounts:logout' %}">로그아웃</a>
+<a href="{% url 'accounts:detail' user.pk %}">{{ user.username }}</a>
 {% else %}
 <a href="{% url 'accounts:login' %}">로그인</a>
 <a href="{% url 'accounts:signup' %}">회원가입</a>
 {% endif %}
 {% for user in users %}
-<a href="{% url 'accounts:detail' user.pk %}">{{ user.username }}</a>
-<p>{{ user.last_name}}{{ user.first_name}}</p>
+<hr>
+<p>{{ user.username }}</p>
+{% if request.user != user%}
+  {% if request.user in user.followers.all %}
+  <a href="{% url 'accounts:follow' user.pk %}">unfollow</a>
+  {% else %}
+  <a href="{% url 'accounts:follow' user.pk %}">follow</a>
+  {% endif %}
+{% endif %}
 <p>{{ user.email }}</p>
 <p>{{ user.followings.count}}/{{ user.followers.count }}</p>
 {% endfor %}

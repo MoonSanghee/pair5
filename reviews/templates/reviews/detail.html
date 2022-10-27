@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+  <h1>detail</h1>
+  <a href="{% url 'reviews:update' review.pk %}">글 수정</a>
+  {% if request.user.is_authenticated %}
+    {% if request.user in review.like_user.all %}
+      <i id="like-btn" data-review-id="{{ review.pk }}" class="bi bi-heart-fill fs-4" style="color: rgb(255, 29, 29);"></i>
+    {% else %}
+      <i id="like-btn" data-review-id="{{ review.pk }}" class="bi bi-heart fs-4"></i>
+    {% endif %}
+  {% else %}
+    <a class="btn text-danger border-danger" href="{% url 'accounts:login' %}">로그인이 필요합니다.</a>
+  {% endif %}
+  <span id="like-count">{{ review.like_user.count }}</span>
+  {% if request.user.is_authenticated %}
+    <form id="comment-form" data-review-id="{{ review.pk }}">
+      {% csrf_token %}
+      {% bootstrap_form comment_form layout='inline'%}
+      <input type="submit" value="OK" class="btn btn-primary btn-md">
+    </form>
+  {% endif %}
+  <hr>
+  <div id="comments">
+  {% for comment in comments %}
+    <p>
+      {{ comment.user.username }}
+      |
+      {{ comment.content }}</p>
+      <hr>
+    <hr>
+  {% empty %}
+    <p>댓글이 없어요 ㅠ_ㅠ</p>
+  {% endfor %}
+{% endblock %}

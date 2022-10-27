@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load django_bootstrap5 %}
+
+{% block content%}
+<h1>articles index</h1>
+<a href="{% url 'reviews:create' %}">새 글 쓰기</a>
+{% for review in reviews %}
+<div>
+  <a href="{% url 'reviews:detail' review.pk %}">{{ review.title }}</a>
+
+</div>
+{% endfor %}
+{% endblock %}

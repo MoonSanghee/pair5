@@ -9,12 +9,12 @@ from django.contrib import messages
 def index(request):
     reviews = Review.objects.all()
     context = {'reviews':reviews}
-    return render(request, 'reviews/index.html')
+    return render(request, 'reviews/index.html', context)
 
 @login_required
 def create(request):
     if request.method == 'POST':
-        review_form = ReviewForm(request.PoST, request.FILES)
+        review_form = ReviewForm(request.POST, request.FILES)
         if review_form.is_valid():
             review = review_form.save(commit=False)
             review.user = request.user

@@ -21,7 +21,7 @@
 {% endif %}
 {% if request.user == user %}
 <a href="{% url 'accounts:update' %}">정보 수정</a>
-<a href="{% url 'accounts:change_password' %}">비밀번호 변경</a>
+<a href="{% url 'accounts:password' %}">비밀번호 변경</a>
 <a href="{% url 'accounts:delete' %}">탈퇴하기</a>
 {% endif %}
 

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load django_bootstrap5 %}
+
+{% block content%}
+
+
+
+<table class="table">
+  <thead>
+    <tr>
+      <th class="col"></th>
+      <th class="col"></th>
+      <th class="col">글 제목</th>
+      <th class="col">작성자</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for review in reviews %}
+    <tr style="vertical-align: middle;">
+      <th class="col-1 align-center">{{ forloop.counter }}</th>
+      {% if review.thumbnail %}
+        <th class="col-2"><img class="rounded-4" src="{{ review.thumbnail.url }}" alt="{{ review.thumbnail }}"></th>
+      {% else %}
+        <th class="col-2"><img class="rounded-4" src="https://via.placeholder.com/120x96/" alt="{{ review.thumbnail }}"></th>
+      {% endif %}
+      <th class="col-7">
+        <a href="{% url 'reviews:detail' review.pk %}" class="text-decoration-none text-dark">
+          {{ review.title }}
+        </a>
+      </th>
+      <th class="col-2">{{ review.user }}</th>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<div class="text-center my-5" style="font-size: 400%;">{{ text }}</div>
+
+
+
+<!--페이징-->
+<ul class="pagination pagination justify-content-center">
+  <!--이전페이지-->
+  {% if reviews.has_previous %}
+  <li class="page-item">
+    <a href="?page={{reviews.previous_page_number}}&amp;field={{ field }}&amp;searched={{ searched }}" class="page-link">이전</a>
+  </li>
+  {% else %}
+  <li class="page-item disabled">
+    <a href="#" class="page-link" aria-disabled="true">이전</a>
+  </li>
+  {% endif %}
+  <!--페이지리스트-->
+  {% for page_number in reviews.paginator.page_range %}
+  {% if page_number >= reviews.number|add:-5 and page_number <= reviews.number|add:5 %}
+    {% if page_number == reviews.number %}
+    <li class="page-item active" aria-current="page">
+      <a href="?page={{ page_number }}&amp;field={{ field }}&amp;searched={{ searched }}" class="page-link">{{ page_number }}</a>
+    </li>
+    {% else %}
+    <li class="page-item">
+      <a class="page-link" href="?page={{ page_number }}&amp;field={{ field }}&amp;searched={{ searched }}">{{ page_number }}</a>
+    </li>
+    {% endif %}
+  {% endif %}
+  {% endfor %}
+  <!--다음페이지-->
+  {% if reviews.has_next %}
+  <li class="page-item">
+    <a href="?page={{reviews.next_page_number}}&amp;field={{ field }}&amp;searched={{ searched }}" class="page-link">다음</a>
+  </li>
+  {% else %}
+  <li class="page-item disabled">
+    <a href="#" class="page-link" aria-disabled="true">다음</a>
+  </li>
+  {% endif %}
+</ul>
+{% endblock %}

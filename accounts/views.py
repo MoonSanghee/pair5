@@ -84,9 +84,9 @@ def follow(request, user_pk):
     user = get_object_or_404(get_user_model(), pk=user_pk)
     if request.user == user:
         messages.warning(request, '스스로 팔로우 할 수 없습니다.')
-        return redirect('accounts:detail', user_pk)
+        return redirect('accounts:index')
     if request.user in user.followers.all():
         user.followers.remove(request.user)
     else:
         user.followers.add(request.user)
-    return redirect('accounts:detail', user_pk) 
+    return redirect('accounts:index')

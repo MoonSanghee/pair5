@@ -4,25 +4,35 @@
 
 {% block content%}
 
-<form class="d-flex" role="search" method='POST' action='{% url 'reviews:search' %}'>
-  {% csrf_token %}
-  <input class="form-control me-2" type="search" placeholder="게시글 검색" name='searched'>
-  <select class="form-select" aria-label="Default select example" name='field'>
-    <option value="1">전체</option>
-    <option value="2">제목</option>
-    <option value="3">내용</option>
-    <option value="4">작성자</option>
-  </select>
 
-  <button class="btn btn-outline-success me-2" type="submit" style="width: 5rem;">검색</button>
-</form>
 
-<h1>reviews index</h1>
-<a href="{% url 'reviews:create' %}">새 글 쓰기</a>
-{% for review in reviews %}
-<div>
-  <a href="{% url 'reviews:detail' review.pk %}">{{ review.title }}</a>
+<table class="table">
+  <thead>
+    <tr>
+      <th class="col"></th>
+      <th class="col"></th>
+      <th class="col">글 제목</th>
+      <th class="col">작성자</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for review in reviews %}
+    <tr style="vertical-align: middle;">
+      <th class="col-1 align-center">{{ forloop.counter }}</th>
+      {% if review.thumbnail %}
+        <th class="col-2"><img class="rounded-4" src="{{ review.thumbnail.url }}" alt="{{ review.thumbnail }}"></th>
+      {% else %}
+        <th class="col-2"><img class="rounded-4" src="https://via.placeholder.com/120x96/" alt="{{ review.thumbnail }}"></th>
+      {% endif %}
+      <th class="col-7">
+        <a href="{% url 'reviews:detail' review.pk %}" class="text-decoration-none text-dark">
+          {{ review.title }}
+        </a>
+      </th>
+      <th class="col-2">{{ review.user }}</th>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
-</div>
-{% endfor %}
 {% endblock %}

@@ -11,9 +11,8 @@ class Review(models.Model):
     grade = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(5)])
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     image = ProcessedImageField(upload_to='images/', blank=True,
-                                processors=[ResizeToFill(1200, 960)],
                                 format='JPEG',
-                                options={'quality': 80})
+)
     thumbnail = ProcessedImageField(upload_to='images/', blank=True,
                                 processors=[ResizeToFill(120, 96)],
                                 format='JPEG',

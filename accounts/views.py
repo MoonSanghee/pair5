@@ -7,6 +7,7 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.http import JsonResponse
 
 # Create your views here.
 def index(request):
@@ -87,6 +88,9 @@ def follow(request, user_pk):
         return redirect('accounts:index')
     if request.user in user.followers.all():
         user.followers.remove(request.user)
+        is_followed = False
     else:
         user.followers.add(request.user)
-    return redirect('accounts:index')
+        is_followed = True
+    context = {'isfollowed': is_followed, 'followCount': user.followers.count()}
+    return JsonResponse(context)

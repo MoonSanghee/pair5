@@ -34,5 +34,45 @@
     {% endfor %}
   </tbody>
 </table>
+<div class="text-center my-5" style="font-size: 400%;">{{ text }}</div>
 
+
+
+<!--페이징-->
+<ul class="pagination pagination justify-content-center">
+  <!--이전페이지-->
+  {% if reviews.has_previous %}
+  <li class="page-item">
+    <a href="?page={{reviews.previous_page_number}}" class="page-link">이전</a>
+  </li>
+  {% else %}
+  <li class="page-item disabled">
+    <a href="#" class="page-link" aria-disabled="true">이전</a>
+  </li>
+  {% endif %}
+  <!--페이지리스트-->
+  {% for page_number in reviews.paginator.page_range %}
+  {% if page_number >= reviews.number|add:-5 and page_number <= reviews.number|add:5 %}
+    {% if page_number == reviews.number %}
+    <li class="page-item active" aria-current="page">
+      <a href="?page={{ page_number }}" class="page-link">{{ page_number }}</a>
+    </li>
+    {% else %}
+    <li class="page-item">
+      <a class="page-link" href="?page={{ page_number }}">{{ page_number }}</a>
+    </li>
+    {% endif %}
+  {% endif %}
+  {% endfor %}
+  <!--다음페이지-->
+  {% if reviews.has_next %}
+  <li class="page-item">
+    <a href="?page={{reviews.next_page_number}}" class="page-link">다음</a>
+  </li>
+  {% else %}
+  <li class="page-item disabled">
+    <a href="#" class="page-link" aria-disabled="true">다음</a>
+  </li>
+  {% endif %}
+</ul>
 {% endblock %}

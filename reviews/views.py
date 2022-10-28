@@ -6,11 +6,16 @@ from .forms import ReviewForm, CommentForm
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from django.core.paginator import Paginator
+
 
 # Create your views here.
 def index(request):
-    reviews = Review.objects.all()
-    context = {'reviews':reviews}
+    reviews = Review.objects.order_by("-pk")
+    page = request.GET.get("page", "1")
+    paginator = Paginator(reviews, 8)
+    page_obj = paginator.get_page(page)
+    context = {"reviews": page_obj}
     return render(request, 'reviews/index.html', context)
 
 @login_required
@@ -107,7 +112,21 @@ def search(request):
             reviews = Review.objects.filter(Q(content__contains=searched))
         elif field == '4':
             reviews = Review.objects.filter(Q(user__username__contains=searched))
-        context = {'reviews' : reviews}
+        if  len(searched) == 0:
+            reviews = []
+            text = "검색어를 입력하세요."
+
+        elif len(reviews) == 0:
+            text = "검색 결과가 없습니다."
+            
+        else:
+            print(reviews)
+            text = ""
+        
+        context = {
+            'reviews' : reviews,
+            "text" : text,
+            }
         return render(request, 'reviews/index.html', context)
     else:
         return redirect('reviews:index')

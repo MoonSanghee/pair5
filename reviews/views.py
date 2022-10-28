@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from .models import Review
+from .models import Review, Comment
 from django.contrib.auth.decorators import login_required
 from .forms import ReviewForm, CommentForm
 from django.contrib import messages
@@ -74,6 +74,15 @@ def comment_create(request, pk):
         'userName': comment.user.username
     }
     return JsonResponse(context)
+  
+@ login_required
+def comment_delete(request, reviews_pk, comment_pk):
+    comment = Comment.objects.get(pk=comment_pk)
+    if request.method == 'POST':
+        if comment.user == request.user:
+            comment.delete()
+            return redirect('reviews:detail', reviews_pk)
+    return redirect('rewiews:detail', reviews_pk)
 
 def likes(request, reviews_pk):
     review = get_object_or_404(Review, pk = reviews_pk)

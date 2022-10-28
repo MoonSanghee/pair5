@@ -3,44 +3,92 @@
 
 {% block content %}
 <section class="card my-3 p-3 border border-3 border-warning">
-<h1>detail</h1>
+<h1 class='text-center'>{{ review.title }}</h1>
+<span class='text-end'>
+  {% if review.grade == 5 %}
+  <i class="bi bi-star-fill text-warning"></i>
+  <i class="bi bi-star-fill text-warning"></i>
+  <i class="bi bi-star-fill text-warning"></i>
+  <i class="bi bi-star-fill text-warning"></i>
+  <i class="bi bi-star-fill text-warning"></i>
+  {% elif review.grade == 4 %}
+  <i class="bi bi-star-fill text-warning"></i>
+  <i class="bi bi-star-fill text-warning"></i>
+  <i class="bi bi-star-fill text-warning"></i>
+  <i class="bi bi-star-fill text-warning"></i>
+  {% elif review.grade == 3 %}
+  <i class="bi bi-star-fill text-warning"></i>
+  <i class="bi bi-star-fill text-warning"></i>
+  <i class="bi bi-star-fill text-warning"></i>
+  {% elif review.grade == 2 %}
+  <i class="bi bi-star-fill text-warning"></i>
+  <i class="bi bi-star-fill text-warning"></i>
+  {% elif review.grade == 1 %}
+  <i class="bi bi-star-fill text-warning"></i>
+  {% endif %}
+</span>
+<hr>
 <p>{{ review.content }}</p>
 {% if review.image %}
   <img src="{{ review.image.url }}" alt="{{ review.image }}">
 {% endif %}
-<a href="{% url 'reviews:update' review.pk %}">글 수정</a>
-
+<div class='text-end my-3'>
+  <a class='btn btn-primary' href="{% url 'reviews:update' review.pk %}">글 수정</a>
+  <a class='btn btn-primary' href="{% url 'reviews:index' %}">홈으로</a>
+</div>
 {% if request.user.is_authenticated %}
   {% if request.user in review.like_user.all %}
-    <i id="like-btn" data-review-id="{{ review.pk }}" class="bi bi-heart-fill fs-4" style="color: rgb(255, 29, 29);"></i>
+    <i id="like-btn" data-review-id="{{ review.pk }}" class="bi bi-heart-fill fs-4 text-center" style="color: red;"></i>
   {% else %}
-    <i id="like-btn" data-review-id="{{ review.pk }}" class="bi bi-heart fs-4"></i>
+    <i id="like-btn" data-review-id="{{ review.pk }}" class="bi bi-heart fs-4 text-center"></i>
   {% endif %}
 {% else %}
-  <a class="btn text-danger border-danger" href="{% url 'accounts:login' %}">로그인이 필요합니다.</a>
+  <a class="btn text-danger border-danger text-center" href="{% url 'accounts:login' %}">로그인이 필요합니다.</a>
 {% endif %}
-<span id="like-count">{{ review.like_user.count }}</span>
+<div class='text-center my-3'>
+  <span class='text-danger'>좋아요 <span id="like-count">{{ review.like_user.count }}</span>개</span>
+</div>
 {% if request.user.is_authenticated %}
-  <form id="comment-form" data-review-id="{{ review.pk }}">
+  <form class='my-3' id="comment-form" data-review-id="{{ review.pk }}">
     {% csrf_token %}
-    {% bootstrap_form comment_form layout='inline'%}
-    <input type="submit" value="OK" class="btn btn-primary btn-md">
+    <div class='row'>
+      <div class='col-11'>{% bootstrap_form comment_form layout='inline'%}</div>
+      <div class='col-1'><input type="submit" value="OK" class="btn btn-primary btn-md"></div>
+    </div>
   </form>
 {% endif %}
-<hr>
+<div id='comments'>
+  {% for comment in comments %}
+  {% if request.user == comment.user %}
+  <div class='row'>
+    <div class='col-11'>
+      {{ comment.user.username }}
+      |
+      {{ comment.content }}
+    </div>
+    <div class='col-1'>
+      <form action="{% url 'reviews:comment_delete' review.pk comment.pk %}" method='POST'>
+        {% csrf_token %}
+        <input class='btn btn-danger btn-sm' type='submit' value='삭제'>
+      </form>
+    </div>
+  </div>
+  {% else %}
+    <div>
+      {{ comment.user.username }}
+      {% if comment.user == review.user %}
+      <span class="badge text-bg-secondary m-1">작성자</span>
+      {% endif %}
+      |
+      {{ comment.content }}
+    </div>
+  {% endif %}
+      <hr>
+  {% empty %}
+    <p>댓글이 없어요 ㅠ_ㅠ</p>
+  {% endfor %}
+</div>
 </section>
-
-<div id="comments">
-{% for comment in comments %}
-  <p>
-    {{ comment.user.username }}
-    |
-    {{ comment.content }}</p>
-    <hr>
-  <hr>
-{% empty %}
-  <p>댓글이 없어요 ㅠ_ㅠ</p>
-{% endfor %}
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>

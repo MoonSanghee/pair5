@@ -24,8 +24,7 @@
                 <div class="">
                     <div class=""></div>
                     <div class="">
-                        <form class="d-flex" role="search" method='POST' action='{% url 'reviews:search' %}'>
-                            {% csrf_token %}
+                        <form class="d-flex" role="search" method='GET' action="{% url 'reviews:search' %}">
                             <select class="select border rounded" aria-label="Default select example" name='field'>
                             <option value="1">전체</option>
                             <option value="2">제목</option>

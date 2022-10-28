@@ -13,7 +13,7 @@ from django.core.paginator import Paginator
 def index(request):
     reviews = Review.objects.order_by("-pk")
     page = request.GET.get("page", "1")
-    paginator = Paginator(reviews, 8)
+    paginator = Paginator(reviews, 1)
     page_obj = paginator.get_page(page)
     context = {"reviews": page_obj}
     return render(request, 'reviews/index.html', context)
@@ -101,32 +101,32 @@ def likes(request, reviews_pk):
     return JsonResponse(context)
 
 def search(request):
-    if request.method == 'POST':
-        searched = request.POST['searched']
-        field = request.POST['field']
-        if field == '1':
-            reviews = Review.objects.filter(Q(title__contains=searched) | Q(content__contains=searched) | Q(user__username__contains=searched))
-        elif field == '2':
-            reviews = Review.objects.filter(Q(title__contains=searched))
-        elif field == '3':
-            reviews = Review.objects.filter(Q(content__contains=searched))
-        elif field == '4':
-            reviews = Review.objects.filter(Q(user__username__contains=searched))
-        if  len(searched) == 0:
-            reviews = []
-            text = "검색어를 입력하세요."
-
-        elif len(reviews) == 0:
-            text = "검색 결과가 없습니다."
-            
-        else:
-            print(reviews)
-            text = ""
-        
-        context = {
-            'reviews' : reviews,
-            "text" : text,
-            }
-        return render(request, 'reviews/index.html', context)
+    searched = request.GET.get('searched', False)
+    field = request.GET.get('field')
+    if field == '1':
+        reviews = Review.objects.filter(Q(title__contains=searched) | Q(content__contains=searched) | Q(user__username__contains=searched)).order_by('-pk')
+    elif field == '2':
+        reviews = Review.objects.filter(Q(title__contains=searched)).order_by('-pk')
+    elif field == '3':
+        reviews = Review.objects.filter(Q(content__contains=searched)).order_by('-pk')
+    elif field == '4':
+        reviews = Review.objects.filter(Q(user__username__contains=searched)).order_by('-pk')
+    if not searched:
+        reviews = []
+        text = "검색어를 입력하세요."
+    elif len(reviews) == 0:
+        text = "검색 결과가 없습니다."
     else:
-        return redirect('reviews:index')
+        text = ""
+    page = request.GET.get("page", "1")
+    paginator = Paginator(reviews, 1)
+    page_obj = paginator.get_page(page)
+    context = {
+        'reviews' : page_obj,
+        "text" : text,
+        'searched': searched,
+        'field' : field,
+        }
+    return render(request, 'reviews/search.html', context)
+    
+        

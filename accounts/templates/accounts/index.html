@@ -4,21 +4,40 @@
 {% for user in users %}
 <hr>
 <p><a class="text-decoration-none text-dark fs-3" href="{% url 'accounts:detail' user.pk %}">{{ user.username }}</a>
-{% if request.user.is_authenticated %}
-  {% if request.user != user%}
-    {% if request.user in user.followers.all %}
-    <a class="btn btn-danger fs-5 badge rounded-pill" href="{% url 'accounts:follow' user.pk %}">unfollow</a>
-    {% else %}
-    <a class="btn btn-primary fs-5 badge rounded-pill" href="{% url 'accounts:follow' user.pk %}">follow</a>
-    {% endif %}
-  {% endif %}
-{% endif %}
-</p>
+
 <p>
   {{ user.email }}
 </p>
-<p>팔로잉  {{ user.followings.count }} / 팔로워 {{ user.followers.count }}</p>
+<p>팔로잉  <span id="following-count">{{ user.followings.count }}</span> / 
+  팔로워 <span id="follow-count">{{ user.followers.count }}</span></p>
 {% endfor %}
 
-
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  const followBtn = document.querySelector('#follow-btn')
+  followBtn.addEventListener('click', function (event) {
+    console.log(event.target.dataset)
+    axios({
+      method : 'get',
+      url: `/accounts/${event.target.dataset.userId}/follow/`
+    })
+    .then(response => {
+      console.log(response)
+      console.log(response.data)
+      if (response.data.isfollowed === true) {
+        event.target.classList.add('btn-danger')
+        event.target.classList.remove('btn-primary')
+        followBtn.innerText = 'follow'
+      } else {
+        event.target.classList.add('btn-primary')
+        event.target.classList.remove('btn-danger')
+        followBtn.innerText = 'unfollow'
+      }
+      const followCount = document.querySelector('#follow-count')
+      followCount.innerText = response.data.followCount
+      const followingCount = document.querySelector('#following-count')
+      followingCount.innerText = response.data.followingCount
+    })
+  })
+</script>
 {% endblock %}

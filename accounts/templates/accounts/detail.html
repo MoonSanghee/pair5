@@ -3,14 +3,13 @@
 <p class="fs-2"> <span class="text-success">{{ user.username }}</span>님의 Profile</p>
 <p class="fs-4">이름 : {{ user.last_name}} {{ user.first_name}}</p>
 <p class="fs-4">email : {{ user.email }}</p>
-<p class="fs-4">팔로우 : {{ user.followings.count}} | 팔로워: {{ user.followers.count }}
+<p class="fs-4">팔로잉 : {{ user.followings.count}} | 팔로워: <span id="follow-count">{{ user.followers.count }}</span>
 {% if request.user != user %}
     {% if request.user in user.followers.all %}
-    <a class="btn btn-danger fs-5 badge rounded-pill" href="{% url 'accounts:follow' user.pk %}">unfollow</a>
+    <span id="follow-btn" data-user-id="{{ user.id }}" class="btn btn-danger fs-5 badge rounded-pill" href="{% url 'accounts:follow' user.pk %}">unfollow</span>
     {% else %}
-    <a class="btn btn-primary fs-5 badge rounded-pill" href="{% url 'accounts:follow' user.pk %}">follow</a>
+    <span id="follow-btn" data-user-id="{{ user.id }}" class="btn btn-primary fs-5 badge rounded-pill" href="{% url 'accounts:follow' user.pk %}">follow</span>
     {% endif %}
-    </a>
 {% endif %}
 </p>
 <section class="row py-3">
@@ -41,4 +40,30 @@
 </div>
 {% endif %}
 
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+  const followBtn = document.querySelector('#follow-btn')
+  followBtn.addEventListener('click', function (event) {
+    console.log(event.target.dataset)
+    axios({
+      method : 'get',
+      url: `/accounts/${event.target.dataset.userId}/follow/`
+    })
+    .then(response => {
+      console.log(response)
+      console.log(response.data)
+      if (response.data.isfollowed === true) {
+        event.target.classList.add('btn-danger')
+        event.target.classList.remove('btn-primary')
+        followBtn.innerText = 'unfollow'
+      } else {
+        event.target.classList.add('btn-primary')
+        event.target.classList.remove('btn-danger')
+        followBtn.innerText = 'follow'
+      }
+      const followCount = document.querySelector('#follow-count')
+      followCount.innerText = response.data.followCount
+    })
+  })
+</script>
 {% endblock %}
